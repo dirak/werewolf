@@ -1,0 +1,7 @@
+"werewolf"
+{
+	"base"		"base"
+	"title"		"Werewolf"
+	"maps"		"^ww_"
+	"menusystem"	"1"
+}
