@@ -28,9 +28,17 @@ function PICKS.NewDay()
 end
 
 function PICKS.PlayerDayPick(ply, cmd, args)--first two are console
-	if #args != 1 then return end
+	if #args != 1 || !IsValid(ply)  then return end
 	local pickee = args[1]
+	pickee = player.GetBySteamID(pickee)
 	PICKS.PlayerDayPicks[ply:SteamID()] = pickee
+	SendPlayerDayPick(ply, pickee:SteamID())
+end
+
+function PICKS.PlayerDayUnPick(ply, cmd, args)
+	if !ply:IsValid() then return end
+	PICKS.PlayerDayPicks[ply:SteamID()] = 0
+	SendPlayerDayPick(ply, 0)
 end
 
 function PICKS.PlayerNightPick(ply, cmd, args)
@@ -76,7 +84,14 @@ function SendPlayerNightPick(ply, pick)
 	net.Send(ply)
 end
 
+function SendPlayerDayPick(ply, pick)
+	ply.NightPick = pick
+	net.Start("WW_DayPick")
+		net.WriteString(pick)
+	net.Send(ply)
+end
 --the API for using this table
 concommand.Add("ww_day_pick", PICKS.PlayerDayPick)
+concommand.Add("ww_day_unpick", PICKS.PlayerDayUnPick)
 concommand.Add("ww_night_pick", PICKS.PlayerNightPick)
 concommand.Add("ww_night_unpick", PICKS.PlayerNightUnPick)

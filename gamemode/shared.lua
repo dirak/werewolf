@@ -39,6 +39,10 @@ ROUND_OVER = 4
 ROUND_DAY_PICK_1 = 5
 ROUND_DAY_PICK_2 = 6
 
+--win state
+ROUND_WEREWOLF_WIN = 7
+ROUND_VILLAGER_WIN = 8
+
 function util.SimpleTime(seconds, fmt)
 	if not seconds then seconds = 0 end
 

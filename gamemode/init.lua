@@ -23,6 +23,10 @@ include("roles/werewolf.lua")
 include("roles/guardian.lua")
 include("roles/detective.lua")
 
+function GM:Initialize()
+ SetGameState(ROUND_WAITING)
+end
+
 function GM:PlayerSpawn( ply )  --What happens when the player spawns
 	self.BaseClass:PlayerSpawn( ply )
 	ply:SetGravity( 0.75 )
@@ -30,6 +34,8 @@ function GM:PlayerSpawn( ply )  --What happens when the player spawns
 
 	ply:SetWalkSpeed( 325 )
 	ply:SetRunSpeed( 325 )
+
+	SendGameState()
 
 end
 
@@ -41,14 +47,17 @@ end --close the function
 
 
 	function GM:PlayerLoadout( ply )
-	print(ply:Team())
 	if ply:Team() == TEAM_PLAYERS then
 		ply:Give( "ww_weapon_picker" )
  end
 end
 
+function KillPlayer(ply)
+	ply:SetTeam(TEAM_SPECTATOR)
+	ply:SetRole(nil)
+end
+
 function ww_team_player( ply )
-	print(ply:Nick())
 	ply:UnSpectate()
 	ply:SetTeam( TEAM_PLAYERS )
 	ply:Spawn()
@@ -57,7 +66,6 @@ function ww_team_player( ply )
 end
 
 function ww_team_spectate( ply )
-	print(ply:Nick())
 	ply:Spectate(OBS_MODE_ROAMING)
 	ply:SetTeam( TEAM_SPECTATOR )
 	--ply:Spawn()
@@ -112,7 +120,7 @@ CreateConVar("ww_werewolf_max", "3")
 CreateConVar("ww_neutral_pct", "0.1")
 CreateConVar("ww_neutral_max", "2")
 CreateConVar("ww_villager_min", "1")
-CreateConVar("ww_day_time", "300")
+CreateConVar("ww_day_time", "20")
 
 function ResetPlayerInfo(ply)
 	ply:SetDead(false)--alive
@@ -131,7 +139,7 @@ function SendPlayerRoles()
 		net.Start("WW_Role")
 			net.WriteString(v:GetRole())
 		net.Send(v)
-		print(v:GetRole())
+
 	end
 end
 
@@ -147,6 +155,21 @@ function PlayerRoleFilter(role)
 	for _,v in pairs(player.GetAll()) do
 		if v:GetRole() == role then
 			table.insert(players, v)
+		end
+	end
+	return players
+end
+
+function PlayerTeamFilter(team)
+	local players = {}
+	for _,v in pairs(player.GetAll()) do
+		if v:HasRole() && v:GetRole() != nil then
+			local role = GetRole(v:GetRole())
+			if role != nil then
+				if role.Team == team then
+					table.insert(players, v)
+				end
+			end
 		end
 	end
 	return players

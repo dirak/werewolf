@@ -55,12 +55,12 @@ function SWEP:PrimaryAttack()
 	local trace = util.GetPlayerTrace(self.Owner)
 	local tr = util.TraceLine(trace)
 	if tr.Entity.IsPlayer() then
-		self.Owner:SetNightPick(tr.Entity)
+		self.Owner:SetPick(tr.Entity)
 	end
 end
 
 --we don't want an alternative fire yet
 function SWEP:SecondaryAttack()
-	self.Owner:SetNightPick(self.Owner)
+	self.Owner:SetPick(self.Owner)
 	return false
 end

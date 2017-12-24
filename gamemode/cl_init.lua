@@ -5,9 +5,6 @@ include("cl_hud.lua")
 include("cl_team.lua")
 include("player_ext.lua")
 
-game_state = ROUND_WAITING
-
-
 local function RoundStart()
 	print("test")
 	RunConsoleCommand("ww_team_player")
@@ -30,6 +27,15 @@ function ReceiveNightPick()
 end
 
 net.Receive("WW_NightPick", ReceiveNightPick)
+
+function ReceiveDayPick()
+	local client = LocalPlayer()
+	local pick = net.ReadString()
+	client.DayPick = pick
+end
+
+net.Receive("WW_DayPick", ReceiveNightPick)
+
 
 function ReceiveOtherPlayersRole()
 	local client = LocalPlayer()
@@ -54,8 +60,9 @@ end
 net.Receive("WW_PlayerInfoReset", ReceivePlayerInfoReset)
 
 function ReceiveGameState()
-	local new_state = net.ReadUInt(2)
-	game_state = new_state
+	local new_state = net.ReadString()
+	local client = LocalPlayer()
+	client.GameState = tonumber(new_state)
 end
 
 net.Receive("WW_GameState", ReceiveGameState)
