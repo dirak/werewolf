@@ -59,3 +59,7 @@ function plymeta:SetKnownRole(target, role)
 	print(target, role)
 	plymeta.RolesKnown[target] = role
 end
+
+function plymeta:ClearKnownRole()
+	plymeta.RolesKnown = {}
+end

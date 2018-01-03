@@ -49,12 +49,13 @@ net.Receive("WW_OtherPlayersRole", ReceiveOtherPlayersRole)
 function ReceivePlayerInfoReset()
 	local client = LocalPlayer()
 	local id = net.ReadString()--verify it is for us
+	print("hello debug")
 	if id == client:SteamID() then
 		--this is fine to be on client, if they fiddle with this
 		--it will just change the UI, the server won't be affected
 		client:SetRole("villager")
 		client.RolesKnown = {}
-	end
+	end 
 end
 
 net.Receive("WW_PlayerInfoReset", ReceivePlayerInfoReset)

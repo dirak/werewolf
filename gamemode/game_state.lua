@@ -30,7 +30,7 @@ end
 function StartFirstDay()
 	print("start first day")
 	SelectRoles()
-	StartDayTwo()
+	StartDay(3)
 end
 
 function StartDay(pick)
@@ -42,8 +42,8 @@ function StartDay(pick)
 		SetGameState(ROUND_DAY_PICK_1)
 		if CheckForWin() then return end
 		timer.Create("day_time", GetConVar("ww_day_time"):GetInt(), 1, StartDayTwo)
-	else
-		ResolveDay()
+	else--pick 3 is first day
+		if pick == 2 then ResolveDay() end
 		SetGameState(ROUND_DAY_PICK_2)
 		timer.Create("day_time", GetConVar("ww_day_time"):GetInt(), 1, StartNight)
 	end
@@ -73,10 +73,10 @@ end
 function SetGameState(state)
 	--we want to uset his so we can sync all the players each time it changes
 	GAMEMODE.GameState = state
-	SendGameState()
+	GAMEMODE.SendGameState()
 end
 
-function SendGameState()
+function GAMEMODE.SendGameState()
 	net.Start("WW_GameState")
 		net.WriteString(GAMEMODE.GameState)
 	net.Broadcast()--send to everyone

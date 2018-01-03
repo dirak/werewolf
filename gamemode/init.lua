@@ -35,7 +35,7 @@ function GM:PlayerSpawn( ply )  --What happens when the player spawns
 	ply:SetWalkSpeed( 325 )
 	ply:SetRunSpeed( 325 )
 
-	SendGameState()
+	GAMEMODE.SendGameState()
 
 end
 
@@ -114,15 +114,18 @@ util.AddNetworkString("WW_OtherPlayersRole")
 util.AddNetworkString("WW_PlayerInfoReset")
 util.AddNetworkString("WW_GameState")
 
-CreateConVar("ww_player_min", "2")
+CreateConVar("ww_player_min", "6")
 CreateConVar("ww_werewolf_pct", "0.25")
 CreateConVar("ww_werewolf_max", "3")
+CreateConVar("ww_werewolf_min", "2")
 CreateConVar("ww_neutral_pct", "0.1")
 CreateConVar("ww_neutral_max", "2")
 CreateConVar("ww_villager_min", "1")
-CreateConVar("ww_day_time", "20")
+CreateConVar("ww_day_time", "120")
 
 function ResetPlayerInfo(ply)
+  print("HELLO")
+  print(ply:Nick())
 	ply:SetDead(false)--alive
 	ply:SetHunted(false)
 	ply:SetRole("villager")
@@ -188,7 +191,7 @@ end
 function GetWerewolfCount(ply_count)
 	--this is a direct copy from TTT, fits our needs perfectly
 	local count = math.floor(ply_count * GetConVar("ww_werewolf_pct"):GetFloat())
-	count = math.Clamp(count, 1, GetConVar("ww_werewolf_max"):GetInt())
+	count = math.Clamp(count, GetConVar("ww_werewolf_min"):GetInt(), GetConVar("ww_werewolf_max"):GetInt())
 	return count
 end
 
@@ -245,7 +248,7 @@ function SelectRoles()
 			neutral_ply:SetRole(role.Name)
 			table.remove(neutral_roles, role_pick)
 			table.remove(choices, pick)
-			neutral = neutral + 1
+			neutral = neutral + 1 
 		end
 	end
 	--if we meed the requirements for a werewolf aligned player, % pick one
@@ -264,8 +267,12 @@ function SelectRoles()
 		end
 	end
 	--ok now special roles for villagers. we will fill in everyone who is left
+  print("Test")
+  print(#choices)
+  print(#villager_roles)
+  print("end")
 	for _,v in pairs(choices) do
-		if #choices > #villager_roles then
+		if #villager_roles == 0 then
 			v:SetRole("Villager")--if we dont have enough roles installed they will be vanilla
 		else
 			local pick = math.random(1, #villager_roles)
@@ -275,6 +282,16 @@ function SelectRoles()
 		end
 	end
 	SendPlayerRoles()
+  --ok now lets inform the other werewolves
+  local werewolves = PlayerRoleFilter("Werewolf")
+  for _,wolf in pairs(werewolves) do
+    for _,wolf2 in pairs(werewolves) do
+      print(wolf:Nick())
+      print(wolf2:Nick())
+      SendOtherPlayersRole(wolf, wolf2)--let first wolf know of all other wolves
+    end
+  end
+
 end
 
 function GM:PlayerDisconnect(ply)

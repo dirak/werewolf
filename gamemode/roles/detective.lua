@@ -15,7 +15,7 @@ function Detective:PrimaryAction(owner, selected)
 	SendOtherPlayersRole(owner, selected)
 	if math.random() <= 0.4 then
 		--reveal role to werewolves
-		local werewolves = PlayerRoleFilter("werewolf")
+		local werewolves = PlayerRoleFilter("Werewolf")
 		for _,wolf in pairs(werewolves) do
 			SendOtherPlayersRole(wolf, owner)
 		end
